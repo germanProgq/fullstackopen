@@ -5,8 +5,6 @@ const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
 
 const App = () => {
-  const [selected, setSelected] = useState(0)
-
   const anecdotes = [
     'If it hurts, do it more often.',
     'Adding manpower to a late software project makes it later!',
@@ -17,8 +15,10 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
     'The only way to go fast, is to go well.'
   ]
-
   const len = anecdotes.length;
+  const [selected, setSelected] = useState(0);
+  const [votes, setVotes] = useState(() => Array(len).fill(0));
+
 
   const selectRandomJoke = () => {
     const randomInt = () => Math.floor(Math.random() * len);
@@ -29,6 +29,16 @@ const App = () => {
     setSelected(chosen);
   }
 
+  const voteForJoke = () => {
+    setVotes(prev => {
+      const next = [...prev];
+      next[selected] += 1;
+      return next;
+    });
+  }
+
+
+
 
   useEffect(() => {
     selectRandomJoke();
@@ -37,7 +47,11 @@ const App = () => {
   return (
     <div>
       <Joke joke={anecdotes[selected]} />
-      <Button onClick={() => selectRandomJoke()} text={'next anecdote'} />
+      <p>Has {votes[selected] === 0 ? 'no' : votes[selected]} votes</p>
+      <div>
+        <Button onClick={() => selectRandomJoke()} text={'next anecdote'} />
+        <Button onClick={voteForJoke} text={'vote'} />
+      </div>
     </div>
   )
 }
