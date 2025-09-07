@@ -5,7 +5,7 @@ const Header = () => <h1>Give Feedback</h1>
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
-const StatisticsLine = ({ value, text }) => <p>{text} {value}</p>
+const StatisticsLine = ({ value, text }) => <tr><th>{text}</th><td>{value}</td></tr>
 
 const Statistics = ({ goodReviews, badReviews, neutralReviews }) => {
   const totalReviews = goodReviews + badReviews + neutralReviews;
@@ -17,15 +17,19 @@ const Statistics = ({ goodReviews, badReviews, neutralReviews }) => {
   const averageReview = goodReviews - badReviews / totalReviews;
   const positiveReview = (goodReviews/totalReviews * 100).toString() + ' %';
   return (
-    <div>
-      <h1>Statistics</h1>
+    <>
+    <h1>Statistics</h1>
+    <table>
+      <tbody>
       <StatisticsLine value={goodReviews} text={'Good: '} />
       <StatisticsLine value={badReviews} text={'Bad: '} />
       <StatisticsLine value={neutralReviews} text={'Neutral: '} />
       <StatisticsLine value={averageReview} text={'Average: '} />
       <StatisticsLine value={totalReviews} text={'Total: '} />
       <StatisticsLine value={positiveReview} text={'Positive: '} />
-    </div>
+      </tbody>
+    </table>
+    </>
   )
 
 }
