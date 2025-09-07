@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const Joke = ({joke}) => <p>{joke}</p>
+const Joke = ({joke, title}) => <div><h1>{title}</h1><p>{joke}</p></div>
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
 
@@ -17,6 +17,7 @@ const App = () => {
   ]
   const len = anecdotes.length;
   const [selected, setSelected] = useState(0);
+  const [highestVoted, setHighestVoted] = useState(null);
   const [votes, setVotes] = useState(() => Array(len).fill(0));
 
 
@@ -33,12 +34,19 @@ const App = () => {
     setVotes(prev => {
       const next = [...prev];
       next[selected] += 1;
+      let maxVotes = next[0];
+      let maxVotesIndex = 0;
+      next.forEach((count, idx) => {
+        if (count > maxVotes) {
+          maxVotes = count;
+          maxVotesIndex = idx;
+        }
+      });
+      setHighestVoted(maxVotesIndex);
+
       return next;
     });
   }
-
-
-
 
   useEffect(() => {
     selectRandomJoke();
@@ -46,12 +54,18 @@ const App = () => {
 
   return (
     <div>
-      <Joke joke={anecdotes[selected]} />
+      <Joke joke={anecdotes[selected]} title="Anecdote of the day" />
       <p>Has {votes[selected] === 0 ? 'no' : votes[selected]} votes</p>
       <div>
         <Button onClick={() => selectRandomJoke()} text={'next anecdote'} />
         <Button onClick={voteForJoke} text={'vote'} />
       </div>
+      {highestVoted !== null && (
+        <>
+          <Joke joke={anecdotes[highestVoted]} title={'Highest voted Anecdote'} />
+          <p>Has {votes[highestVoted]} votes</p>
+        </>
+      )}
     </div>
   )
 }
