@@ -5,12 +5,18 @@ const Header = () => <h1>Give Feedback</h1>
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
-const Display = ({ goodReviews, badReviews, neutralReviews }) => {
+const Statistics = ({ goodReviews, badReviews, neutralReviews }) => {
   const totalReviews = goodReviews + badReviews + neutralReviews;
-  const averageReview = (goodReviews - badReviews) / totalReviews;
-  const positiveReview = totalReviews === 0 ? 0 : (goodReviews/totalReviews) * 100;
+
+  if (totalReviews === 0) {
+    return <><h1>Statistics</h1><p>No feedback given</p></>
+  }
+  
+  const averageReview = goodReviews - badReviews / totalReviews;
+  const positiveReview = goodReviews/totalReviews * 100;
   return (
     <div>
+      <h1>Statistics</h1>
       <p>Good: {goodReviews} </p>
       <p>Bad: {badReviews} </p>
       <p>Neutral: {neutralReviews}</p>
@@ -52,7 +58,7 @@ function App() {
     <Button onClick={() => leaveReview('neutral')}
     text={"neutral"} />
 
-    <Display badReviews={badReviews} goodReviews={goodReviews} neutralReviews={neutralReviews} />
+    <Statistics badReviews={badReviews} goodReviews={goodReviews} neutralReviews={neutralReviews} />
     </>
   )
 }
