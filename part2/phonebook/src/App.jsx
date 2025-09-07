@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useState } from 'react'
 
 const Person = (props) => {
@@ -17,6 +16,11 @@ const App = () => {
 
   const addContact = (event) => {
     event.preventDefault();
+    if (persons.some(person => person.name === newContact)) {
+      alert(newContact + ' is already in the phonebook');
+      setNewContact("");
+      return false;
+    }
     const newPersons = persons.concat({name: newContact});
     setPersons(newPersons);
     setNewContact("");
@@ -26,9 +30,7 @@ const App = () => {
   const handleInputContactAdd = (event) => {
     setNewContact(event.target.value);
   }
-  useEffect(() => {
 
-  }, [])
   return (
     <div>
       <h2>Phonebook</h2>
