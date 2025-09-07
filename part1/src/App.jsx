@@ -5,9 +5,11 @@ const Header = (props) => {
 };
 
 const Content = (props) => {
-  <p>
+  return (
+    <p>
     {props.part} {props.exercise}
-  </p>
+    </p>
+  )
 };
 const Total = (props) => {
   return <p>Number of exercises {props.exercises1 + props.exercises2 + props.exercises3}</p>;
