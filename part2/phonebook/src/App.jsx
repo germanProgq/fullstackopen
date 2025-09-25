@@ -14,7 +14,10 @@ const App = () => {
   ]) 
   const [newContactName, setNewContact] = useState('');
   const [newContactPhone, setNewContactPhone] = useState('');
+  const [filterKeyword, setFilter] = useState('');
+  const [filteredContacrs, setFilteredContacts] = useState([])
 
+  //Contact
   const addContact = (event) => {
     event.preventDefault();
     if (!newContactName || !newContactPhone || newContactName.trim() === '') {
@@ -33,7 +36,6 @@ const App = () => {
     setNewContactPhone("");
 
   }
-
   const handleInputContactAdd = (event) => {
     setNewContact(event.target.value);
   }
@@ -41,10 +43,32 @@ const App = () => {
     setNewContactPhone(event.target.value);
   }
 
+  //Filter
+  const handleFilterInput = (event) => {
+    setFilter(event.target.value);
+    filterPhonebook();
+  }
+  const filterPhonebook = () => {
+    const filtered = persons.some(person => {
+      if (person.name.toLowerCase().includes(filterKeyword.toLowerCase()) || person.contact.includes(filterKeyword)) {
+        if (!filteredContacrs.some(p => p.name === person.name && p.contact === person.contact)) {
+          setFilteredContacts(prev => [...prev, person]);
+        }
+      }
+      return false;
+    });
+    console.log(filteredContacrs)
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
+      <div>
+      <h1>Filter</h1>
+      <input type='text' placeholder='filter...' onChange={handleFilterInput} value={filterKeyword}></input>
+      </div>
       <form onSubmit={addContact}>
+        <h1>Add a new</h1>
         <div>
           name: <input value={newContactName} onChange={handleInputContactAdd}/>
           contact: <input type='number' value={newContactPhone} onChange={handleInputContactPhoneAdd}/>
