@@ -1,32 +1,7 @@
-import Course from "./components/Course"
-// const Header = (props) => {
-//   return <h1>{props.course.name}</h1>;
-// };
-
-// const Content = (props) => {
-//   return (
-//     <div>
-//       <Part part={props.course.parts[0]} />
-//       <Part part={props.course.parts[1]} />
-//       <Part part={props.course.parts[2]} />
-//     </div>
-//   );
-// };
-
-// const Part = (props) => {
-//   return (
-//     <p>
-//       {props.part.name} {props.part.exercises}
-//     </p>
-//   )
-// }
-// const Total = (props) => {
-//   const sum = props.course.parts[0].exercises + props.course.parts[1].exercises + props.course.parts[2].exercises;
-//   return <p>Number of exercises {sum} </p>;
-// };
+import Course from './components/Course'
 
 const App = () => {
-  const courses = [
+ const courses = [
     {
       name: 'Half Stack application development',
       id: 1,
@@ -70,13 +45,10 @@ const App = () => {
       ]
     }
   ]
-  return (
-    <>
-    {courses.map((c, idx) => (
-      <Course key={idx} course={c} />
-    ))}
-    </>
-  )
+
+  return courses.map((course, i) => {
+    return <Course course={course} key={course.id}/>
+  });
 }
 
 export default App
