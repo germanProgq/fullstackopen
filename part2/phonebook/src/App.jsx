@@ -1,90 +1,96 @@
 import { useState } from 'react'
 
-const Person = (props) => {
-  return (
-    <>
-      <p>{props.name} {props.phoneNumber}</p>
-    </>
-  )
-}
+
+  // Filtered input
+  const Filter = ({value, onChange}) => <input placeholder='search...' value={value} onChange={onChange}/>
+
+  const PersonForm = ({onFormSubmit, onNewNameSubmit, newNameValue, onNewPhoneSubmit, newPhoneValue}) => {
+    return (
+      <>
+        <form onSubmit={onFormSubmit}>
+          <ul>
+            <li>name: <input onChange={onNewNameSubmit} value={newNameValue}/> </li>
+            <li>phone: <input onChange={onNewPhoneSubmit} value={newPhoneValue}/> </li>
+          </ul>
+          <div>
+            <button type="submit">add</button>
+          </div>
+        </form>
+      </>
+    )
+  }
+
+  const Persons = ({persons}) =>  <div>{persons.map((person, id) => {return <p key={person.id}>{person.name} {person.phone}</p>})}</div>
+
+
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', contact: '040-1234567' },
-  ]) 
-  const [newContactName, setNewContact] = useState('');
-  const [newContactPhone, setNewContactPhone] = useState('');
-  const [filterKeyword, setFilter] = useState('');
-  const [filteredContacrs, setFilteredContacts] = useState([])
+    { name: 'Arto Hellas', phone: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
+  ])
 
-  //Contact
-  const addContact = (event) => {
-    event.preventDefault();
-    if (!newContactName || !newContactPhone || newContactName.trim() === '') {
-      alert("Please fill in both inputs");
-      return false;
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [filteredInput, setFilteredInput] = useState('');
+  const [showFiltered, setShowFiltered] = useState(persons)
+
+    // Regarding names
+  const newNameInput = (e) => {
+    setNewName(e.target.value);
+  }
+  // Regarding phone nums
+  const handlePhoneInput = (e) => {
+    e.preventDefault()
+    setNewPhone(e.target.value);
+  }
+
+  // Submit form to create new Person
+  const handlePersonSubmit = (e) => {
+    e.preventDefault();
+    const newPersonAdd = {name: newName, phone: newPhone}
+
+    if (persons.filter(persons => persons.name === newName).length > 0 || persons.filter(persons => persons.phone === newPhone).length > 0)
+    {
+      alert(`Name ${newName} or phone number ${newPhone} alr exists in the list`);
+      return;
     }
-    if (persons.some(person => person.name === newContactName || persons.some(person => person.contact === newContactPhone))) {
-      alert(newContactName + 'or' + newContactPhone + ' is already in the phonebook');
-      setNewContact("");
-      setNewContactPhone("");
-      return false;
-    }
-    const newPersons = persons.concat({name: newContactName, contact: newContactPhone});
-    setPersons(newPersons);
-    setNewContact("");
-    setNewContactPhone("");
-
-  }
-  const handleInputContactAdd = (event) => {
-    setNewContact(event.target.value);
-  }
-  const handleInputContactPhoneAdd = (event) => {
-    setNewContactPhone(event.target.value);
+    
+    setPersons(persons.concat(newPersonAdd));
+    setNewName("");
+    setNewPhone("");
   }
 
-  //Filter
-  const handleFilterInput = (event) => {
-    setFilter(event.target.value);
-    filterPhonebook();
+  // Filtering searches
+  const handleSearch = (e) => {
+    setFilteredInput(e.target.value);
+    // if (e.target.value === '') {
+    //   setShowFiltered(persons)
+    //   return;
+    // }
+
+    // Use target value here because react updates are async and this would otherwise lag behind
+    const filtered = persons.filter(person => person.name.toLowerCase().startsWith(e.target.value.toLowerCase()))
+    setShowFiltered(filtered)
   }
-  const filterPhonebook = () => {
-    const filtered = persons.some(person => {
-      if (person.name.toLowerCase().includes(filterKeyword.toLowerCase()) || person.contact.includes(filterKeyword)) {
-        if (!filteredContacrs.some(p => p.name === person.name && p.contact === person.contact)) {
-          setFilteredContacts(prev => [...prev, person]);
-        }
-      }
-      return false;
-    });
-    console.log(filteredContacrs)
-  }
+
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-      <h1>Filter</h1>
-      <input type='text' placeholder='filter...' onChange={handleFilterInput} value={filterKeyword}></input>
-      </div>
-      <form onSubmit={addContact}>
-        <h1>Add a new</h1>
-        <div>
-          name: <input value={newContactName} onChange={handleInputContactAdd}/>
-          contact: <input type='number' value={newContactPhone} onChange={handleInputContactPhoneAdd}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter value={filteredInput} onChange={handleSearch}/>
+      <PersonForm 
+        onFormSubmit={handlePersonSubmit}
+        onNewNameSubmit={newNameInput} 
+        newNameValue={newName}
+        onNewPhoneSubmit={setNewPhone}
+        newPhoneValue={newPhone}
+      />
+
       <h2>Numbers</h2>
-
-      <>
-        {persons.map((pers, idx) => {
-          return <Person key={idx} name={pers.name} phoneNumber={pers.contact} />
-        })}
-      </>
-
+      <Persons persons={showFiltered}/>
     </div>
   )
 }
