@@ -24,8 +24,16 @@ import server from './persons'
   const DeletePersonButton = ({onDelete, id}) => {
     return <button style={{color: 'blue'}} onClick={() => onDelete(id)}>Delete</button>
   }
+  const Persons = ({persons, onDelete}) =>  <div>{persons.map((person) => {return <div style={{display: 'flex'}} key={person.id} ><p>{person.name} {person.phone}</p><DeletePersonButton onDelete={onDelete} id={person.id} /></div>})}</div>
 
-  const Persons = ({persons, onDelete}) =>  <div>{persons.map((person) => {return <div style={{display: 'flex'}}><p key={person.id}>{person.name} {person.phone}</p><DeletePersonButton onDelete={onDelete} id={person.id} /></div>})}</div>
+  const Message = ({successMessage, errorMessage}) => {
+    const messageClass = successMessage ? 'success' : 'error';
+    const message = successMessage || errorMessage;
+    
+    return (
+      <div className={messageClass}>{message}</div>
+    );
+  }
 
 
 
@@ -34,6 +42,8 @@ const App = () => {
   const [newPhone, setNewPhone] = useState('');
   const [filteredInput, setFilteredInput] = useState('');
   const [persons, setPersons] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     server.getAll()
@@ -46,7 +56,22 @@ const App = () => {
     if (window.confirm("Are you sure you want to delete this person?"))
     {
       server.deletePerson(id).then(() => {
+      setSuccessMessage("Successfully deleted");
+      setTimeout(() => {
+        setSuccessMessage(null);        
+      }, 3000);
       setPersons(persons.filter(person => person.id !== id));
+      })
+      .catch((e) => {
+        if (e.status === 404) {
+          setErrorMessage(`Information about the user had already been deleted`);
+        }
+        else {
+          setErrorMessage("Failed to delete person");
+        }
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 3000)
       });
     }
   }
@@ -105,6 +130,7 @@ const App = () => {
 
   return (
     <div>
+      <Message successMessage={successMessage} errorMessage={errorMessage} />
       <h2>Phonebook</h2>
       <Filter value={filteredInput} onChange={handleSearch}/>
       <PersonForm 
