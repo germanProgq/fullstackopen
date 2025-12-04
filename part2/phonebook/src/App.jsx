@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import server from './persons'
 
 
   // Filtered input
@@ -20,22 +21,35 @@ import { useState } from 'react'
     )
   }
 
-  const Persons = ({persons}) =>  <div>{persons.map((person, id) => {return <p key={person.id}>{person.name} {person.phone}</p>})}</div>
+  const DeletePersonButton = ({onDelete, id}) => {
+    return <button style={{color: 'blue'}} onClick={() => onDelete(id)}>Delete</button>
+  }
+
+  const Persons = ({persons, onDelete}) =>  <div>{persons.map((person) => {return <div style={{display: 'flex'}}><p key={person.id}>{person.name} {person.phone}</p><DeletePersonButton onDelete={onDelete} id={person.id} /></div>})}</div>
 
 
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', phone: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
-  ])
-
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [filteredInput, setFilteredInput] = useState('');
-  const [showFiltered, setShowFiltered] = useState(persons)
+  const [persons, setPersons] = useState([]);
+
+  useEffect(() => {
+    server.getAll()
+    .then(res => {
+      setPersons(res)
+    })
+  }, [])
+
+  const deletePerson = (id) => {
+    if (window.confirm("Are you sure you want to delete this person?"))
+    {
+      server.deletePerson(id).then(() => {
+      setPersons(persons.filter(person => person.id !== id));
+      });
+    }
+  }
 
     // Regarding names
   const newNameInput = (e) => {
@@ -57,24 +71,23 @@ const App = () => {
       alert(`Name ${newName} or phone number ${newPhone} alr exists in the list`);
       return;
     }
-    
-    setPersons(persons.concat(newPersonAdd));
-    setNewName("");
-    setNewPhone("");
+    server.create(newPersonAdd)
+    .then(res => {
+      setPersons(persons.concat(res));
+      setNewName("");
+      setNewPhone("");
+    });
   }
 
   // Filtering searches
   const handleSearch = (e) => {
     setFilteredInput(e.target.value);
-    // if (e.target.value === '') {
-    //   setShowFiltered(persons)
-    //   return;
-    // }
-
-    // Use target value here because react updates are async and this would otherwise lag behind
-    const filtered = persons.filter(person => person.name.toLowerCase().startsWith(e.target.value.toLowerCase()))
-    setShowFiltered(filtered)
   }
+
+  const shownPeople = filteredInput === '' 
+  ? persons 
+  : persons.filter((some) => 
+    some.name.toLowerCase().startsWith(filteredInput.toLowerCase()));
 
 
   return (
@@ -85,12 +98,12 @@ const App = () => {
         onFormSubmit={handlePersonSubmit}
         onNewNameSubmit={newNameInput} 
         newNameValue={newName}
-        onNewPhoneSubmit={setNewPhone}
+        onNewPhoneSubmit={handlePhoneInput}
         newPhoneValue={newPhone}
       />
 
       <h2>Numbers</h2>
-      <Persons persons={showFiltered}/>
+      <Persons persons={shownPeople} onDelete={deletePerson}/>
     </div>
   )
 }
