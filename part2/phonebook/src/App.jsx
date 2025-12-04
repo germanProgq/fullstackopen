@@ -66,9 +66,22 @@ const App = () => {
     e.preventDefault();
     const newPersonAdd = {name: newName, phone: newPhone}
 
-    if (persons.filter(persons => persons.name === newName).length > 0 || persons.filter(persons => persons.phone === newPhone).length > 0)
+    if (persons.filter(persons => persons.name === newName).length > 0)
     {
-      alert(`Name ${newName} or phone number ${newPhone} alr exists in the list`);
+      if (!persons.filter(persons => persons.phone === newPhone).length > 0) {
+        if (window.confirm(`${newName} exists in the codebase. Replace the phone?`)) {
+          const personId = (persons.filter(persons => persons.name === newName))[0].id;
+          newPersonAdd.id = personId;
+          console.log(personId);    
+          server.update(personId, newPersonAdd);
+          setPersons(persons.map(person => person.id !== personId ? person : newPersonAdd));
+          setNewName("");
+          setNewPhone("");          
+        }
+        else {
+          alert(`Name ${newName} or phone number ${newPhone} alr exists in the list`);
+        }
+      }
       return;
     }
     server.create(newPersonAdd)

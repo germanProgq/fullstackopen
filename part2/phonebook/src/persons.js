@@ -9,7 +9,7 @@ const getAll = async () => {
 };
 
 const update = async (id, newObj) => {
-    const req = axios.post(`${baseUrl}/${id}`, newObj);
+    const req = axios.put(`${baseUrl}/${id}`, newObj);
     const res = await req;
     return res.data;
 };
