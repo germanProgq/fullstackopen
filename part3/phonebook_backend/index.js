@@ -1,8 +1,11 @@
 const express = require("express");
+const cors = require('cors')
 const app = express();
 var morgan = require('morgan');
 
 app.use(express.json());
+app.use(cors());
+app.use(express.static('dist'));
 
 morgan.token("body", (req, res) => {
     const body = req.body;
@@ -82,7 +85,7 @@ app.put('/api/persons', (req, res) => {
         res.status(422).send({ error: "Name or number must be in the entry" });
         return;
     }
-    if (persons.filter((person) => person.name === personBody.name).length > 0 || persons.filter((person) => person.number === personBody.number))
+    if (persons.filter((person) => person.name === personBody.name).length > 0 || persons.filter((person) => person.number === personBody.number).length > 0)
     {
         res.status(409).send({ error: "User alredy exists" });
         return;

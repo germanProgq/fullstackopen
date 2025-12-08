@@ -1,29 +1,46 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:3001/persons"
+const baseUrl = "http://localhost:3001/api/persons"
 
 const getAll = async () => {
-    const req = axios.get(baseUrl);
-    const res = await req;
-    return res.data;
+    try {
+        const req = axios.get(baseUrl);
+        const res = await req;
+        return res.data;
+    }
+    catch (err) {
+        return err.response.data;
+    }
 };
 
 const update = async (id, newObj) => {
-    const req = axios.put(`${baseUrl}/${id}`, newObj);
-    const res = await req;
-    return res.data;
+    try {
+        const req = axios.put(`${baseUrl}/${id}`, newObj);
+        const res = await req;
+        return res.data;
+    }
+    catch (err) {
+        return err.response.data;
+    }
 };
 
 const create = async (newObj) => {
-    const req = axios.post(`${baseUrl}`, newObj);
-    const res = await req;
-    return res.data;
+  try {
+    const res = await axios.put(baseUrl, newObj);
+    return res.data;            // success
+  } catch (err) {
+    return err.response.data;   // backend error response
+  }
 };
 
 const deletePerson = async (id) => {
-    const req = axios.delete(`${baseUrl}/${id}`);
-    const res = await req;
-    return res.data;
+    try {    
+        const req = axios.delete(`${baseUrl}/${id}`);
+        return res.data;
+    }
+    catch (err) {
+        return err.response.data;
+    }
 }
 
 export default {getAll, update, create, deletePerson}

@@ -24,7 +24,7 @@ import server from './persons'
   const DeletePersonButton = ({onDelete, id}) => {
     return <button style={{color: 'blue'}} onClick={() => onDelete(id)}>Delete</button>
   }
-  const Persons = ({persons, onDelete}) =>  <div>{persons.map((person) => {return <div style={{display: 'flex'}} key={person.id} ><p>{person.name} {person.phone}</p><DeletePersonButton onDelete={onDelete} id={person.id} /></div>})}</div>
+  const Persons = ({persons, onDelete}) =>  <div>{persons.map((person) => {return <div style={{display: 'flex'}} key={person.id} ><p>{person.name} {person.number}</p><DeletePersonButton onDelete={onDelete} id={person.id} /></div>})}</div>
 
   const Message = ({successMessage, errorMessage}) => {
     const messageClass = successMessage ? 'success' : 'error';
@@ -89,11 +89,16 @@ const App = () => {
   // Submit form to create new Person
   const handlePersonSubmit = (e) => {
     e.preventDefault();
-    const newPersonAdd = {name: newName, phone: newPhone}
+    if (newName.trim() === "" || newPhone.trim() === "") {
+      alert("Name or phone number cannot be empty");
+      return;
+    }
+    const newPersonAdd = {name: newName, number: newPhone};
 
-    if (persons.filter(persons => persons.name === newName).length > 0)
+
+    if (persons.filter(person => person.name === newName).length > 0)
     {
-      if (!persons.filter(persons => persons.phone === newPhone).length > 0) {
+      if (!persons.filter(person => person.number === newPhone).length > 0) {
         if (window.confirm(`${newName} exists in the codebase. Replace the phone?`)) {
           const personId = (persons.filter(persons => persons.name === newName))[0].id;
           newPersonAdd.id = personId;
@@ -101,17 +106,27 @@ const App = () => {
           server.update(personId, newPersonAdd);
           setPersons(persons.map(person => person.id !== personId ? person : newPersonAdd));
           setNewName("");
-          setNewPhone("");          
-        }
-        else {
-          alert(`Name ${newName} or phone number ${newPhone} alr exists in the list`);
+          setNewPhone("");   
+          return;       
         }
       }
+      else {
+        alert("User already exists in the database")
+      }
+      
       return;
     }
     server.create(newPersonAdd)
     .then(res => {
-      setPersons(persons.concat(res));
+      console.log(res);
+      if (res.error) {
+        setErrorMessage(res.error);
+        setTimeout(() => {
+          setErrorMessage("");          
+        }, 2000);
+        return;
+      }
+      setPersons(persons.concat(newPersonAdd));
       setNewName("");
       setNewPhone("");
     });
